@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "dva";
 
-import { Board } from "./../../component";
+import { MoveBox } from "./../../game";
 import "./index.less";
 
 const Home = ({}) => {
@@ -12,7 +12,7 @@ const Home = ({}) => {
   return (
     <div className={"homePageContain"}>
       <div className="boardContain0">
-        <Board></Board>
+        <MoveBox></MoveBox>
       </div>
     </div>
   );
