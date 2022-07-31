@@ -20,7 +20,7 @@ const Board = ({}) => {
   const [renderList, setRenderList] = useState();
 
   const curSeat = useRef();
-  const [curLevel, setCurLevel] = useState(4);
+  const [curLevel, setCurLevel] = useState(5);
   const [step, setStep] = useState(0);
   const [showNum, setShowNum] = useState(false);
 
@@ -137,8 +137,12 @@ const Board = ({}) => {
           if (isWin) {
             break;
           }
+
           if (cloneData[i][j].value) {
             for (let k = 0; k < dir.length; k++) {
+              if (step === tempStep + 1) {
+                answerList = [];
+              }
               if (
                 inArea(
                   { indexX: i, indexY: j },
@@ -181,12 +185,21 @@ const Board = ({}) => {
                   setShowNum(true);
                   break;
                 } else {
-                  // answerList.pop();
+                  // answerList.pop11();
                   if (tempStep > 0) {
                     _solve(tempData, tempStep, answerList);
                   }
-                  answerList.pop();
+                  //  else if (k === 2 && tempStep === 0) {
+                  //   answerList = [];
+                  // } else {
+                  //   answerList.pop();
+                  // }
                 }
+              } else {
+                // 3个方向遍历完 且无剩余步数
+                // if (k === 2 && tempStep === 0) {
+                //   answerList = [];
+                // }
               }
             }
           }
