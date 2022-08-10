@@ -20,7 +20,7 @@ const Board = ({}) => {
   const [renderList, setRenderList] = useState();
 
   const curSeat = useRef();
-  const [curLevel, setCurLevel] = useState(5);
+  const [curLevel, setCurLevel] = useState(0);
   const [step, setStep] = useState(0);
   const [showNum, setShowNum] = useState(false);
 
@@ -118,17 +118,17 @@ const Board = ({}) => {
 
   const getAnswer = () => {
     const dir = [
+      { indexX: 1, indexY: 0 },
       { indexX: 0, indexY: 1 },
       { indexX: 0, indexY: -1 },
-      { indexX: 1, indexY: 0 },
     ];
     let isWin = false;
     let tempStep = step;
-    let answerList1 = [];
-    const _solve = (list, tempStep, answerList) => {
-      tempStep--;
-      const cloneData = _.cloneDeep(list);
 
+    let num = 0; // 遍历次数
+    const _solve = (list, tempStep, answerStr) => {
+      const cloneData = _.cloneDeep(list);
+      tempStep--;
       for (let i = 0; i < cloneData.length; i++) {
         if (isWin) {
           break;
@@ -140,9 +140,11 @@ const Board = ({}) => {
 
           if (cloneData[i][j].value) {
             for (let k = 0; k < dir.length; k++) {
-              if (step === tempStep + 1) {
-                answerList = [];
+              num++;
+              if (isWin) {
+                break;
               }
+
               if (
                 inArea(
                   { indexX: i, indexY: j },
@@ -155,51 +157,36 @@ const Board = ({}) => {
                   { indexX: i + dir[k].indexX, indexY: j + dir[k].indexY },
                   cloneData
                 );
-                // if (answerList.length === 2) {
-                //   answerList.pop();
-                // }
-                answerList.push([
-                  { indexX: i, indexY: j },
-                  { indexX: i + dir[k].indexX, indexY: j + dir[k].indexY },
-                ]);
-                const resList = mockAction(tempData);
 
+                const resList = mockAction(tempData);
+                const resStr =
+                  answerStr +
+                  "$" +
+                  `(${i},${j}) -> (${i + dir[k].indexX},${j + dir[k].indexY})`;
                 if (judgeVictory(resList)) {
-                  console.log("resList", resList);
-                  // debugger;
+                  console.log("遍历次数：", num);
                   notification.open({
                     message: "答案",
                     duration: null,
-                    description: answerList.map((item, index) => {
-                      const { indexX, indexY } = item[0];
-                      const { indexX: indexX1, indexY: indexY1 } = item[1];
-                      return (
-                        <div key={index}>
-                          第{index + 1}步 ：
-                          {`(${indexX}, ${indexY}) ->(${indexX1}, ${indexY1})`}
-                        </div>
-                      );
-                    }),
+                    description: resStr
+                      .split("$")
+                      .filter((item) => item)
+                      .map((item1, index) => {
+                        return (
+                          <div key={index}>
+                            第{index + 1}步 {item1}
+                          </div>
+                        );
+                      }),
                   });
                   isWin = true;
                   setShowNum(true);
                   break;
                 } else {
-                  // answerList.pop11();
                   if (tempStep > 0) {
-                    _solve(tempData, tempStep, answerList);
+                    _solve(resList, tempStep, resStr);
                   }
-                  //  else if (k === 2 && tempStep === 0) {
-                  //   answerList = [];
-                  // } else {
-                  //   answerList.pop();
-                  // }
                 }
-              } else {
-                // 3个方向遍历完 且无剩余步数
-                // if (k === 2 && tempStep === 0) {
-                //   answerList = [];
-                // }
               }
             }
           }
@@ -207,7 +194,7 @@ const Board = ({}) => {
       }
     };
 
-    _solve(renderList, tempStep, answerList1);
+    _solve(renderList, tempStep, "");
   };
 
   return (
